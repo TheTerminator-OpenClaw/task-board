@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mission Control
+
+A task management and team organization dashboard for the Terminator AI assistant.
+
+## Overview
+
+Mission Control is a Next.js web application that provides:
+
+- **Task Board** — Kanban-style task management for tracking work
+- **Calendar** — Schedule of automated tasks and cron jobs
+- **Team** — Organizational structure of Terminator and sub-agents
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Database:** localStorage (can migrate to Convex)
+- **Deployment:** Local development server
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
 
 ```bash
+# Clone the repository
+cd task-board
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Access
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Local: http://localhost:3000
+- Network: http://[YOUR_IP_ADDRESS]:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+### Tasks
 
-To learn more about Next.js, take a look at the following resources:
+- Kanban board with 3 columns: To Do, In Progress, Done
+- Assign tasks to Ammar or Terminator
+- Priority levels (low/medium/high)
+- Task statistics per assignee
+- LocalStorage persistence
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Calendar
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Today's schedule view with timeline
+- Weekly calendar view
+- Active/paused task status
+- Shows all scheduled cron jobs
 
-## Deploy on Vercel
+### Team
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Organizational hierarchy with Terminator as lead
+- Sub-agents: Developer, Research, Content, Trading, Design
+- Performance tracking (tasks completed, success rate)
+- Fire underperforming agents 🔥
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+task-board/
+├── src/
+│   └── app/
+│       ├── page.tsx         # Tasks page + sidebar
+│       ├── calendar/
+│       │   └── page.tsx    # Calendar view
+│       └── team/
+│           └── page.tsx     # Team org chart
+├── public/
+├── package.json
+├── tailwind.config.ts
+└── next.config.ts
+```
+
+## Environment
+
+- Runs locally on Mac mini
+- Data stored in browser localStorage
+- Can be accessed from other devices on network
+
+## Owner
+
+Built for Ammar by Terminator AI 🤖
+
+## License
+
+MIT
