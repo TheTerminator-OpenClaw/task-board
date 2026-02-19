@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 type Assignee = "ammar" | "terminator";
 
@@ -27,7 +25,6 @@ const defaultSchedule: Omit<ScheduledEvent, "nextRun">[] = [
 ];
 
 export default function CalendarPage() {
-  const pathname = usePathname();
   const [schedule, setSchedule] = useState<ScheduledEvent[]>([]);
   const [view, setView] = useState<"today" | "week">("today");
 
@@ -50,55 +47,54 @@ export default function CalendarPage() {
     return { day, events: schedule.filter(e => e.status === "active" && (e.frequency === "daily" || e.dayOfWeek === day)) };
   });
 
-  const navItems = [
-    { href: "/", label: "Tasks", icon: "📋" },
-    { href: "/calendar", label: "Calendar", icon: "📅" },
-    { href: "/team", label: "Team", icon: "👥" },
-  ];
-
   const activeCount = schedule.filter(e => e.status === "active").length;
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
-      <div className="w-64 bg-gray-800 p-4 flex flex-col">
-        <h1 className="text-xl font-bold text-white mb-6 px-2">Mission Control</h1>
-        <nav className="space-y-1">
-          {navItems.map(item => (
-            <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${pathname === item.href ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-        <div className="mt-auto pt-4 border-t border-gray-700">
-          <div className="space-y-3">
-            <div className="bg-gray-700 rounded-lg p-3"><p className="text-xs text-gray-400">Scheduled</p><p className="text-xl font-bold">{activeCount}</p></div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
+            <p className="text-gray-500 mt-1">Scheduled tasks & cron jobs</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setView("today")} className={`px-4 py-2 rounded-lg font-medium ${view === "today" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>Today</button>
+            <button onClick={() => setView("week")} className={`px-4 py-2 rounded-lg font-medium ${view === "week" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>Week</button>
           </div>
         </div>
-      </div>
 
-      <div className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div><h2 className="text-2xl font-bold text-white">Calendar</h2><p className="text-gray-400 mt-1">Scheduled tasks & cron jobs</p></div>
-          <div className="flex gap-2">
-            <button onClick={() => setView("today")} className={`px-4 py-2 rounded-lg ${view === "today" ? "bg-blue-600" : "bg-gray-700"}`}>Today</button>
-            <button onClick={() => setView("week")} className={`px-4 py-2 rounded-lg ${view === "week" ? "bg-blue-600" : "bg-gray-700"}`}>Week</button>
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <p className="text-sm text-gray-500">Active Events</p>
+            <p className="text-2xl font-bold">{activeCount}</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <p className="text-sm text-gray-500">Today's Events</p>
+            <p className="text-2xl font-bold">{todayEvents.length}</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <p className="text-sm text-gray-500">This Week</p>
+            <p className="text-2xl font-bold">{weekEvents.reduce((sum, d) => sum + d.events.length, 0)}</p>
           </div>
         </div>
 
         {view === "today" ? (
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="font-semibold mb-4">Today's Schedule</h3>
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <h3 className="font-semibold mb-4 text-lg">Today's Schedule</h3>
             <div className="space-y-2">
               {todayEvents.map(event => (
-                <div key={event.id} className={`flex items-center justify-between p-3 rounded-lg ${parseInt(event.time.split(":")[0]) <= currentHour ? "bg-gray-700/50" : "bg-gray-700"}`}>
+                <div key={event.id} className={`flex items-center justify-between p-3 rounded-lg ${parseInt(event.time.split(":")[0]) <= currentHour ? "bg-gray-100" : "bg-gray-50"}`}>
                   <div className="flex items-center gap-4">
                     <span className="text-lg font-mono w-16">{event.time}</span>
-                    <div><p className="font-medium">{event.title}</p><p className="text-sm text-gray-400">{event.description}</p></div>
+                    <div>
+                      <p className="font-medium">{event.title}</p>
+                      <p className="text-sm text-gray-400">{event.description}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded ${event.assignee === "ammar" ? "bg-orange-900 text-orange-200" : "bg-purple-900 text-purple-200"}`}>{event.assignee === "ammar" ? "Ammar" : "Terminator"}</span>
-                    <button onClick={() => toggleStatus(event.id)} className={`text-xs px-2 py-1 rounded ${event.status === "active" ? "bg-green-900 text-green-200" : "bg-gray-600"}`}>{event.status}</button>
+                    <span className={`text-xs px-2 py-1 rounded ${event.assignee === "ammar" ? "bg-orange-100 text-orange-800" : "bg-purple-100 text-purple-800"}`}>{event.assignee === "ammar" ? "Ammar" : "Terminator"}</span>
+                    <button onClick={() => toggleStatus(event.id)} className={`text-xs px-2 py-1 rounded ${event.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-200"}`}>{event.status}</button>
                   </div>
                 </div>
               ))}
@@ -108,9 +104,9 @@ export default function CalendarPage() {
           <div className="grid grid-cols-7 gap-2">
             {weekEvents.map((day, idx) => (
               <div key={idx}>
-                <div className={`text-center py-2 rounded-t-lg font-medium ${idx === 0 ? "bg-blue-600" : "bg-gray-700"}`}>{dayNames[day.day]}</div>
-                <div className="bg-gray-800 rounded-b-lg p-2 space-y-1 min-h-[200px]">
-                  {day.events.length === 0 ? <p className="text-xs text-gray-500 text-center">—</p> : day.events.map(e => (<div key={e.id} className="bg-gray-700 rounded p-1 text-xs"><span className="font-mono">{e.time}</span> {e.title}</div>))}
+                <div className={`text-center py-2 rounded-t-lg font-medium text-white ${idx === 0 ? "bg-blue-600" : "bg-gray-600"}`}>{dayNames[day.day]}</div>
+                <div className="bg-white rounded-b-lg p-2 space-y-1 min-h-[200px] border border-t-0 border-gray-200">
+                  {day.events.length === 0 ? <p className="text-xs text-gray-400 text-center">—</p> : day.events.map(e => (<div key={e.id} className="bg-gray-100 rounded p-1 text-xs"><span className="font-mono">{e.time}</span> {e.title}</div>))}
                 </div>
               </div>
             ))}
