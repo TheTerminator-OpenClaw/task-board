@@ -17,11 +17,34 @@ interface ScheduledEvent {
 
 const SCHEDULE_STORAGE = "terminator-schedule";
 
-const defaultSchedule: Omit<ScheduledEvent, "nextRun">[] = [
-  { id: "1", title: "Morning News Debrief", description: "Send AI/Tech/Crypto news summary", time: "08:30", frequency: "daily", assignee: "terminator", status: "active" },
-  { id: "2", title: "Trading Update", description: "Check crypto/stock prices", time: "12:00", frequency: "daily", assignee: "terminator", status: "active" },
-  { id: "3", title: "Evening Trading Check", description: "Final trading review", time: "20:00", frequency: "daily", assignee: "terminator", status: "active" },
-  { id: "4", title: "Weekly Content Review", description: "Review Value Shift", time: "10:00", frequency: "weekly", dayOfWeek: 1, assignee: "ammar", status: "active" },
+// All actual cron jobs
+const defaultSchedule: ScheduledEvent[] = [
+  // Daily - Morning
+  { id: "1", title: "Morning News Debrief", description: "AI/Tech news at 8:30 AM", time: "08:30", frequency: "daily", assignee: "terminator", status: "active" },
+  
+  // Daily - Hourly
+  { id: "2", title: "Hourly Trading Check", description: "Every hour, log to file", time: "09:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "3", title: "Hourly Trading Check", description: "Every hour, log to file", time: "10:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "4", title: "Hourly Trading Check", description: "Every hour, log to file", time: "11:00", frequency: "daily", assignee: "terminator", status: "active" },
+  
+  // Daily - Noon
+  { id: "5", title: "Noon News Summary", description: "Read AI_News_Summary from Downloads, send via iMessage", time: "12:00", frequency: "daily", assignee: "terminator", status: "active" },
+  
+  // Daily - Afternoon
+  { id: "6", title: "Hourly Trading Check", description: "Every hour, log to file", time: "13:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "7", title: "Hourly Trading Check", description: "Every hour, log to file", time: "14:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "8", title: "Hourly Trading Check", description: "Every hour, log to file", time: "15:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "9", title: "Hourly Trading Check", description: "Every hour, log to file", time: "16:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "10", title: "Hourly Trading Check", description: "Every hour, log to file", time: "17:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "11", title: "Hourly Trading Check", description: "Every hour, log to file", time: "18:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "12", title: "Hourly Trading Check", description: "Every hour, log to file", time: "19:00", frequency: "daily", assignee: "terminator", status: "active" },
+  
+  // Daily - Evening
+  { id: "13", title: "Evening News Debrief", description: "AI/Tech news at 8 PM", time: "20:00", frequency: "daily", assignee: "terminator", status: "active" },
+  { id: "14", title: "8PM Trading Update", description: "Send trading update via iMessage", time: "20:00", frequency: "daily", assignee: "terminator", status: "active" },
+  
+  // Weekly
+  { id: "15", title: "Weekly Content Review", description: "Review Value Shift", time: "10:00", frequency: "weekly", dayOfWeek: 1, assignee: "ammar", status: "active" },
 ];
 
 export default function CalendarPage() {
@@ -30,8 +53,8 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem(SCHEDULE_STORAGE);
-    if (stored) { try { setSchedule(JSON.parse(stored)); } catch { setSchedule(defaultSchedule as ScheduledEvent[]); } }
-    else { setSchedule(defaultSchedule as ScheduledEvent[]); }
+    if (stored) { try { setSchedule(JSON.parse(stored)); } catch { setSchedule(defaultSchedule); } }
+    else { setSchedule(defaultSchedule); }
   }, []);
 
   const saveSchedule = (s: ScheduledEvent[]) => { setSchedule(s); localStorage.setItem(SCHEDULE_STORAGE, JSON.stringify(s)); };
@@ -55,7 +78,7 @@ export default function CalendarPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
-            <p className="text-gray-500 mt-1">Scheduled tasks & cron jobs</p>
+            <p className="text-gray-500 mt-1">All cron jobs & scheduled tasks</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setView("today")} className={`px-4 py-2 rounded-lg font-medium ${view === "today" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>Today</button>
