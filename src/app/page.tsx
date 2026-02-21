@@ -46,22 +46,26 @@ export default function TaskBoard() {
     priority: "medium" as Priority,
   });
 
-  // Load tasks from localStorage
+  // Load tasks from API (persistent storage)
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setTasks(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse tasks:", e);
-      }
-    }
+    fetch('/api/tasks')
+      .then(res => res.json())
+      .then(data => {
+        if (data.tasks && data.tasks.length > 0) {
+          setTasks(data.tasks);
+        }
+      })
+      .catch(console.error);
   }, []);
 
-  // Save tasks to localStorage whenever they change
+  // Save tasks to API (persistent storage) whenever they change
   const saveTasks = useCallback((newTasks: Task[]) => {
     setTasks(newTasks);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newTasks));
+    fetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tasks: newTasks }),
+    }).catch(console.error);
   }, []);
 
   const handleCreateTask = () => {

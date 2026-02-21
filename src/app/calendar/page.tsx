@@ -50,11 +50,38 @@ const defaultSchedule: ScheduledEvent[] = [
 export default function CalendarPage() {
   const [schedule, setSchedule] = useState<ScheduledEvent[]>([]);
   const [view, setView] = useState<"today" | "week">("today");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem(SCHEDULE_STORAGE);
-    if (stored) { try { setSchedule(JSON.parse(stored)); } catch { setSchedule(defaultSchedule); } }
-    else { setSchedule(defaultSchedule); }
+    // Try to fetch from API first, fall back to defaults
+    async function fetchCronJobs() {
+      try {
+        const response = await fetch('/api/cron?key=mission-control-cron-sync');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.events && data.events.length > 0) {
+            setSchedule(data.events);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('API fetch failed, using defaults:', e);
+        setError('Using cached schedule');
+      }
+      
+      // Fall back to stored or default
+      const stored = localStorage.getItem(SCHEDULE_STORAGE);
+      if (stored) { 
+        try { setSchedule(JSON.parse(stored)); } 
+        catch { setSchedule(defaultSchedule); } 
+      }
+      else { setSchedule(defaultSchedule); }
+      setLoading(false);
+    }
+    
+    fetchCronJobs();
   }, []);
 
   const saveSchedule = (s: ScheduledEvent[]) => { setSchedule(s); localStorage.setItem(SCHEDULE_STORAGE, JSON.stringify(s)); };
@@ -62,7 +89,7 @@ export default function CalendarPage() {
 
   const now = new Date();
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const todayEvents = schedule.filter(e => e.status === "active" && e.frequency === "daily").sort((a, b) => a.time.localeCompare(b.time));
+  const todayEvents = schedule.sort((a, b) => a.time.localeCompare(b.time));
   const currentHour = now.getHours();
 
   const weekEvents: { day: number; events: ScheduledEvent[] }[] = Array.from({ length: 7 }, (_, i) => {
@@ -71,6 +98,17 @@ export default function CalendarPage() {
   });
 
   const activeCount = schedule.filter(e => e.status === "active").length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Syncing with OpenClaw...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
